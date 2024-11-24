@@ -124,18 +124,41 @@ class FordFulkerson():
             bfs.reset() 
         return max_flow
 
-graph = Graph()
-graph.add_nodes(['S', 'A', 'C', 'B', 'D', 'T'])
-graph.add_edge('S', 'A', 4)
-graph.add_edge('S', 'C', 3)
-graph.add_edge('A', 'B', 4)
-graph.add_edge('B', 'C', 3)
-graph.add_edge('B', 'T', 2)
-graph.add_edge('C', 'D', 6)
-graph.add_edge('D', 'T', 6)
+# STARTER GRAPH WITH CITIES AND CONNECTIONS
+STARTER_GRAPH = Graph()
+STARTER_GRAPH.add_nodes(['BGA', 'BOG', 'MDE', 'CUC', 'BAC', 'EYP'
+         'NVA', 'AXM', 'CRC', 'UIB', 'APO', 'MTR'
+         'CTG'])
+# BGA
+STARTER_GRAPH.add_edge('BGA', 'BOG', 0)
+STARTER_GRAPH.add_edge('BGA', 'CUC', 0)
+STARTER_GRAPH.add_edge('BGA', 'CTG', 0)
+STARTER_GRAPH.add_edge('BGA', 'MDE', 0)
+# BOG
+STARTER_GRAPH.add_edge('BOG', 'EYP', 0)
+STARTER_GRAPH.add_edge('BOG', 'NVA', 0)
+STARTER_GRAPH.add_edge('BOG', 'MDE', 0)
+STARTER_GRAPH.add_edge('BOG', 'BAC', 0)
+STARTER_GRAPH.add_edge('BOG', 'AXM', 0)
+STARTER_GRAPH.add_edge('BOG', 'CRC', 0)
+STARTER_GRAPH.add_edge('BOG', 'UIB', 0)
+# MED
+STARTER_GRAPH.add_edge('MED', 'NVA', 0)
+STARTER_GRAPH.add_edge('MED', 'AXM', 0)
+STARTER_GRAPH.add_edge('MED', 'UIB', 0)
+STARTER_GRAPH.add_edge('MED', 'MTR', 0)
+STARTER_GRAPH.add_edge('MED', 'APO', 0)
+STARTER_GRAPH.add_edge('MED', 'CUC', 0)
+# CTG
+STARTER_GRAPH.add_edge('CTG', 'MED', 0)
+STARTER_GRAPH.add_edge('CTG', 'MTR', 0)
+# AXM
+STARTER_GRAPH.add_edge('AXM', 'CRC', 0)
+# UIB
+STARTER_GRAPH.add_edge('UIB', 'APO', 0)
 
-starting_node = 'S'
-ending_node = 'T'
-method = FordFulkerson(graph, starting_node, ending_node)
+#starting_node = # ?
+# ending_node = # ?
+# method = FordFulkerson(graph, starting_node, ending_node)
 
-print(f"The maximum possible flow is {method.initiate()}")
+# print(f"The maximum possible flow is {method.initiate()}")
