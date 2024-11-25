@@ -13,8 +13,8 @@
 # MTR = MONTERIA
 # CTG = CARTAGENA
 
-NODES = ['BGA', 'BOG', 'MDE', 'CUC', 'BAC', 'EYP'
-         'NVA', 'AXM', 'CRC', 'UIB', 'APO', 'MTR'
+NODES = ['BGA', 'BOG', 'MDE', 'CUC', 'BAC', 'EYP',
+         'NVA', 'AXM', 'CRC', 'UIB', 'APO', 'MTR',
          'CTG']
 
 class Graph():
@@ -43,6 +43,12 @@ class Graph():
             if u not in self.representation[v]:
                 self.representation[v][u] = 0
             self.representation[v][u] += flow
+
+    def update_availability(self, conditions):
+        for city_conditionated, new_availability in conditions.items():
+            for destinies in self.representation.values():
+                if city_conditionated in destinies:
+                    destinies[city_conditionated] += new_availability
 
     def __repr__(self):
         return str(self.representation)
@@ -127,38 +133,45 @@ class FordFulkerson():
 # STARTER GRAPH WITH CITIES AND CONNECTIONS
 STARTER_GRAPH = Graph()
 STARTER_GRAPH.add_nodes(['BGA', 'BOG', 'MDE', 'CUC', 'BAC', 'EYP'
-         'NVA', 'AXM', 'CRC', 'UIB', 'APO', 'MTR'
+         'NVA', 'AXM', 'CRC', 'UIB', 'APO', 'MTR',
          'CTG'])
 # BGA
-STARTER_GRAPH.add_edge('BGA', 'BOG', 0)
-STARTER_GRAPH.add_edge('BGA', 'CUC', 0)
-STARTER_GRAPH.add_edge('BGA', 'CTG', 0)
-STARTER_GRAPH.add_edge('BGA', 'MDE', 0)
+STARTER_GRAPH.add_edge('BGA', 'BOG', 5)
+STARTER_GRAPH.add_edge('BGA', 'CUC', 5)
+STARTER_GRAPH.add_edge('BGA', 'CTG', 5)
+STARTER_GRAPH.add_edge('BGA', 'MDE', 5)
 # BOG
-STARTER_GRAPH.add_edge('BOG', 'EYP', 0)
-STARTER_GRAPH.add_edge('BOG', 'NVA', 0)
-STARTER_GRAPH.add_edge('BOG', 'MDE', 0)
-STARTER_GRAPH.add_edge('BOG', 'BAC', 0)
-STARTER_GRAPH.add_edge('BOG', 'AXM', 0)
-STARTER_GRAPH.add_edge('BOG', 'CRC', 0)
-STARTER_GRAPH.add_edge('BOG', 'UIB', 0)
+STARTER_GRAPH.add_edge('BOG', 'EYP', 5)
+STARTER_GRAPH.add_edge('BOG', 'NVA', 5)
+STARTER_GRAPH.add_edge('BOG', 'MDE', 5)
+STARTER_GRAPH.add_edge('BOG', 'BAC', 5)
+STARTER_GRAPH.add_edge('BOG', 'AXM', 5)
+STARTER_GRAPH.add_edge('BOG', 'CRC', 5)
+STARTER_GRAPH.add_edge('BOG', 'UIB', 5)
 # MED
-STARTER_GRAPH.add_edge('MED', 'NVA', 0)
-STARTER_GRAPH.add_edge('MED', 'AXM', 0)
-STARTER_GRAPH.add_edge('MED', 'UIB', 0)
-STARTER_GRAPH.add_edge('MED', 'MTR', 0)
-STARTER_GRAPH.add_edge('MED', 'APO', 0)
-STARTER_GRAPH.add_edge('MED', 'CUC', 0)
+STARTER_GRAPH.add_edge('MDE', 'NVA', 5)
+STARTER_GRAPH.add_edge('MDE', 'AXM', 5)
+STARTER_GRAPH.add_edge('MDE', 'UIB', 5)
+STARTER_GRAPH.add_edge('MDE', 'MTR', 5)
+STARTER_GRAPH.add_edge('MDE', 'APO', 5)
+STARTER_GRAPH.add_edge('MDE', 'CUC', 5)
 # CTG
-STARTER_GRAPH.add_edge('CTG', 'MED', 0)
-STARTER_GRAPH.add_edge('CTG', 'MTR', 0)
+STARTER_GRAPH.add_edge('CTG', 'MDE', 5)
+STARTER_GRAPH.add_edge('CTG', 'MTR', 5)
 # AXM
-STARTER_GRAPH.add_edge('AXM', 'CRC', 0)
+STARTER_GRAPH.add_edge('AXM', 'CRC', 5)
 # UIB
-STARTER_GRAPH.add_edge('UIB', 'APO', 0)
+STARTER_GRAPH.add_edge('UIB', 'APO', 5)
+
+print(STARTER_GRAPH)
+from api import API
+api = API()
+report = api.generate_report()
+STARTER_GRAPH.update_availability(report)
+print(STARTER_GRAPH)
 
 #starting_node = # ?
-# ending_node = # ?
+#ending_node = # ?
 # method = FordFulkerson(graph, starting_node, ending_node)
 
 # print(f"The maximum possible flow is {method.initiate()}")
