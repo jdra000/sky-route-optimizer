@@ -165,8 +165,10 @@ STARTER_GRAPH.add_edge('UIB', 'APO', 5)
 
 print(STARTER_GRAPH)
 from api import API
+import asyncio
+
 api = API()
-report = api.generate_report()
+report = asyncio.run(api.main())
 STARTER_GRAPH.update_availability(report)
 print(STARTER_GRAPH)
 
