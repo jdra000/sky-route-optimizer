@@ -1,4 +1,3 @@
-import requests
 import asyncio
 import aiohttp
 
@@ -19,12 +18,21 @@ api_key = os.getenv('API_KEY')
 
 class API:
     def __init__(self, api_key):
-        self.cities = ['bucaramanga', 'bogota', 'medellin', 'cucuta', 'barrancabermeja',
-           'yopal', 'neiva', 'armenia', 'cartago', 'quibdo', 'apartado', 
-           'monteria', 'cartagena']
-        self.nodes = ['BGA', 'BOG', 'MDE', 'CUC', 'BAC', 'EYP',
-         'NVA', 'AXM', 'CRC', 'UIB', 'APO', 'MTR',
-         'CTG']
+        self.city_codes = {
+            'bucaramanga':'BGA', 
+            'bogota':'BOG', 
+            'medellin':'MDE', 
+            'cucuta':'CUC', 
+            'barrancabermeja':'BAC',
+            'yopal':'EYP', 
+            'neiva':'NVA', 
+            'armenia':'AXM', 
+            'cartago':'CRC', 
+            'quibdo':'UIB', 
+            'apartado':'APO', 
+            'monteria':'MTR', 
+            'cartagena':'CTG'
+        }
         self.report = {}
         self.api_key = api_key
 
@@ -32,12 +40,12 @@ class API:
         async with aiohttp.ClientSession() as session:
             # First task: Fetch coordinates for each city
             async with asyncio.TaskGroup() as tg:
-                tasks = {city: tg.create_task(self.get_coordinates(session, city)) for city in self.cities}
+                tasks = {city: tg.create_task(self.get_coordinates(session, city)) for city in self.city_codes.keys()}
             coordinates = {city: {'lat': task.result()[0], 'lon': task.result()[1]} for city, task in tasks.items()}
             
             # Second task: Build weather report for each city
             async with asyncio.TaskGroup() as tg:
-                tasks = {city: tg.create_task(self.get_weather_report(session, coordinate)) for city, coordinate in zip(self.nodes, coordinates.values())}
+                tasks = {city: tg.create_task(self.get_weather_report(session, coordinate)) for city, coordinate in zip(self.city_codes.values(), coordinates.values())}
             final_report = {city : task.result() for city, task in tasks.items()}
             
         return final_report
@@ -57,8 +65,8 @@ class API:
                     return None
             return lat, lon
 
-    async def get_weather_report(self, session, coordinates):
-        lat, lon = coordinates.get('lat'), coordinates.get('lon')
+    async def get_weather_report(self, session, coordinate):
+        lat, lon = coordinate.get('lat'), coordinate.get('lon')
         url = f'https://api.openweathermap.org/data/2.5/weather?lat={lat}&lon={lon}&appid={self.api_key}'
 
         async with session.get(url) as response:
