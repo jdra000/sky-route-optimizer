@@ -112,7 +112,7 @@ class FordFulkerson():
         self.graph = graph
         self.starting_node = starting_node
         self.ending_node = ending_node
-        self.paths = []
+        self.paths =[]
         
     def initiate(self):
         # 1. Initialize flow to 0
@@ -130,7 +130,7 @@ class FordFulkerson():
             path_flow = self.graph.create_residual_graph(path)
             self.graph.update_residual_graph(path, path_flow)
 
-            self.paths.append(path + list(str(path_flow)))
+            self.paths.append(path +  list(str(path_flow)))
 
             # 5. Update current flow
             max_flow += path_flow
@@ -186,7 +186,7 @@ print(STARTER_GRAPH)
 print()
 
 starting_node = 'BGA'
-ending_node ='CRC'
+ending_node ='APO'
 method = FordFulkerson(STARTER_GRAPH, starting_node, ending_node)
 print(f"The maximum possible flow is {method.initiate()}")
 print(method.paths)

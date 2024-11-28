@@ -177,6 +177,7 @@
             .then(data => {
                 console.log(data)
                 const origin = data[0][0]
+                const destination = data[0][data[0].length - 2]
                 console.log(data[0])
                 console.log(data[0].includes('BOG'))
                 console.log(origin)
@@ -238,8 +239,8 @@
                         { source: "MDE", target: "AXM", color: "grey" },
                         { source: "MDE", target: "UIB", color: "grey" },
                         { source: "MDE", target: "MTR", color: "grey" },
-                        { source: "BGA", target: "APO", color: "grey" },
-                        { source: "BGA", target: "CUC", color: "grey" },
+                        { source: "MDE", target: "APO", color: "grey" },
+                        { source: "MDE", target: "CUC", color: "grey" },
 
                         { source: "CTG", target: "MDE", color: "grey" },
                         { source: "CTG", target: "MTR", color: "grey" },
@@ -254,14 +255,18 @@
                         node.x = x;
                         node.y = y;
                         if (node.id == origin){
-                            node.color = 'yellow'
+                            node.color = '#0f62fe'
+                        }else if (node.id == destination){
+                            node.color = '#3ddbd9'
                         }
 
                     });
 
                     links.forEach(link => {
-                        if (data[0].includes(link.source) && data[0].includes(link.target)){
+                        for (let i = 0; i < data.length; i++){
+                            if (data[i].includes(link.source) && data[i].includes(link.target)){
                             link.color = '#0f62fe'
+                        }
                         }
                     })
 
