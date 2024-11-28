@@ -84,6 +84,3 @@ class API:
                         risks -= 1
 
                     return risks
-
-api = API(api_key)
-print(asyncio.run(api.main()))

@@ -13,6 +13,14 @@
 # MTR = MONTERIA
 # CTG = CARTAGENA
 
+from flask import Flask, jsonify, render_template
+app = Flask(__name__)
+
+
+@app.route('/')
+def index():
+    return render_template('map.html')
+
 NODES = ['BGA', 'BOG', 'MDE', 'CUC', 'BAC', 'EYP',
          'NVA', 'AXM', 'CRC', 'UIB', 'APO', 'MTR',
          'CTG']
@@ -104,6 +112,7 @@ class FordFulkerson():
         self.graph = graph
         self.starting_node = starting_node
         self.ending_node = ending_node
+        self.paths = []
         
     def initiate(self):
         # 1. Initialize flow to 0
@@ -121,7 +130,7 @@ class FordFulkerson():
             path_flow = self.graph.create_residual_graph(path)
             self.graph.update_residual_graph(path, path_flow)
 
-            print(path + list(str(path_flow)))
+            self.paths.append(path + list(str(path_flow)))
 
             # 5. Update current flow
             max_flow += path_flow
@@ -132,7 +141,7 @@ class FordFulkerson():
 
 # STARTER GRAPH WITH CITIES AND CONNECTIONS
 STARTER_GRAPH = Graph()
-STARTER_GRAPH.add_nodes(['BGA', 'BOG', 'MDE', 'CUC', 'BAC', 'EYP'
+STARTER_GRAPH.add_nodes(['BGA', 'BOG', 'MDE', 'CUC', 'BAC', 'EYP',
          'NVA', 'AXM', 'CRC', 'UIB', 'APO', 'MTR',
          'CTG'])
 # BGA
@@ -163,6 +172,7 @@ STARTER_GRAPH.add_edge('AXM', 'CRC', 5)
 # UIB
 STARTER_GRAPH.add_edge('UIB', 'APO', 5)
 
+print('-------  GRAPH AT THE BEGGINING: \n')
 print(STARTER_GRAPH)
 from api import API
 from api import api_key
@@ -171,10 +181,21 @@ import asyncio
 api = API(api_key)
 report = asyncio.run(api.main())
 STARTER_GRAPH.update_availability(report)
+print('\nGRAPH UPDATED\n')
 print(STARTER_GRAPH)
+print()
 
-#starting_node = # ?
-#ending_node = # ?
-# method = FordFulkerson(graph, starting_node, ending_node)
+starting_node = 'BGA'
+ending_node ='CRC'
+method = FordFulkerson(STARTER_GRAPH, starting_node, ending_node)
+print(f"The maximum possible flow is {method.initiate()}")
+print(method.paths)
 
-# print(f"The maximum possible flow is {method.initiate()}")
+
+
+@app.route('/data')
+def get_data():
+    return method.paths
+
+if __name__ == '__main__':
+    app.run(debug=True)

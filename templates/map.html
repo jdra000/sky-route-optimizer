@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Control Tower Radar</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #161616;
+            color: #f6f2ff;
+            position: relative;
+            overflow: hidden;
+        }
+
+        h1 {
+            text-align: center;
+            padding-top: 30px;
+            font-size: 20px;
+            font-weight: 500;
+            color: #FFFFFF;
+        }
+        .airplane{
+            fill: #d4bbff;
+        }
+
+        #container {
+            display: flex;
+            justify-content: space-between;
+            padding: 20px;
+            height: calc(100vh - 40px);
+        }
+
+        svg {
+            margin: 10px;
+            background-color: #161616;
+        }
+
+        #dropdown-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin-right: 150px;
+            padding: 10px;
+            background-color: #161616;
+            border-radius: 10px;
+            box-shadow: 0px 4px 8px rgba(93, 91, 91, 0.5);
+            height: 100px;
+            width: 300px;
+        }
+
+        #dropdown-wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        #dropdown {
+            width: 70%;
+            padding: 10px;
+            font-size: 14px;
+            border-radius: 5px;
+            border: none;
+            background-color: #d4bbff;
+            color: black;
+        }
+        #dropdown:focus {
+            outline: none;
+        }
+
+
+        #search-button {
+            padding: 10px 15px;
+            font-size: 14px;
+            background-color: #d4bbff;
+            color: #161616;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        #search-button:hover {
+            background-color: #2aa6a5;
+        }
+
+        #current-destination {
+            margin-top: 10px;
+            font-size: 14px;
+            color: #f0f0f0;
+        }
+
+        #weather-box {
+            background-color: #161616;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 8px rgba(93, 91, 91, 0.5);
+            height: 150px;
+            width: 280px;
+            margin-top: 20px;
+        }
+
+        #weather-title {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #f6f2ff;
+        }
+
+        #weather-content {
+            font-size: 14px;
+            color: #d4bbff;
+        }
+
+        .node {
+            stroke: #333;
+            stroke-width: 1px;
+        }
+
+        .link {
+            stroke-width: 2px;
+            transition: stroke 0.3s ease;
+        }
+
+        text {
+            font-size: 12px;
+            fill: #f6f2ff;
+        }
+    </style>
+</head>
+<body>
+    <h1>BGA (Aeropuerto Internacional Palonegro)</h1>
+    <div id="container">
+        <svg width="800" height="600"></svg>
+        <div id="side-panel">
+            <div id="dropdown-container">
+                <div id="dropdown-wrapper">
+                    <select id="dropdown">
+                        <option value="Bogotá">Bogotá</option>
+                        <option value="Medellín">Medellín</option>
+                        <option value="Cúcuta">Cúcuta</option>
+                        <option value="Barrancabermeja">Barrancabermeja</option>
+                        <option value="Yopal">Yopal</option>
+                        <option value="Neiva">Neiva</option>
+                        <option value="Armenia">Armenia</option>
+                        <option value="Cartago">Cartago</option>
+                        <option value="Quibdó">Quibdó</option>
+                        <option value="Apartadó">Apartadó</option>
+                        <option value="Montería">Montería</option>
+                        <option value="Cartagena">Cartagena</option>
+                    </select>
+                    <button id="search-button">Search</button>
+                </div>
+                <div id="current-destination">Destination: Medellín</div>
+            </div>
+            <div id="weather-box">
+                <div id="weather-title">Weather Information</div>
+                <div id="weather-content">
+                    <p>City: Medellín</p>
+                    <p>Temperature: 25°C</p>
+                    <p>Conditions: Clear</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        fetch('/data')
+            .then(respone => respone.json())
+            .then(data => {
+                console.log(data)
+                const origin = data[0][0]
+                console.log(data[0])
+                console.log(data[0].includes('BOG'))
+                console.log(origin)
+
+                const width = 800, height = 600;
+
+                const svg = d3.select("svg");
+
+                d3.json("/static/colombia.geo.json").then(geoData => {
+                    const projection = d3.geoMercator()
+                                        .scale(3800)
+                                        .center([-74, 6.8])
+                                        .translate([width / 2, height / 2]);
+
+                    const path = d3.geoPath().projection(projection);
+
+                    // Draw map with dark background
+                    svg.selectAll("path")
+                    .data(geoData.features)
+                    .enter()
+                    .append("path")
+                    .attr("d", path)
+                    .attr("fill", "#262626")
+                    .attr("stroke", "gray")
+                    .attr("stroke-width", 0.5);
+
+                    const nodes = [
+                        { id: "BGA", coords: [-73.2112, 7.1142], color: "#d4bbff" },
+                        { id: "BOG", coords: [-74.0721, 4.7110], color: "#d4bbff" },
+                        { id: "MDE", coords: [-75.5636, 6.2518], color: "#d4bbff" },
+                        { id: "CUC", coords: [-72.5078, 7.8930], color: "#d4bbff" },
+                        { id: "BAC", coords: [-73.8719, 7.0667], color: "#d4bbff" },
+                        { id: "EYP", coords: [-72.3924, 5.3442], color: "#d4bbff" },
+                        { id: "NVA", coords: [-75.2803, 2.9310], color: "#d4bbff" },
+                        { id: "AXM", coords: [-75.6817, 4.5411], color: "#d4bbff" },
+                        { id: "CRC", coords: [-75.2239, 4.4383], color: "#d4bbff" },
+                        { id: "UIB", coords: [-76.6414, 5.6949], color: "#d4bbff" },
+                        { id: "APO", coords: [-76.7553, 7.8821], color: "#d4bbff" },
+                        { id: "MTR", coords: [-75.8830, 8.7472], color: "#d4bbff" },
+                        { id: "CTG", coords: [-75.4794, 10.3910], color: "#d4bbff" }
+                    ];
+
+
+                    const links = [
+                        { source: "BGA", target: "BOG", color: "grey" },
+                        { source: "BGA", target: "CUC", color: "grey" },
+                        { source: "BGA", target: "CTG", color: "grey" },
+                        { source: "BGA", target: "MDE", color: "grey" },
+
+                        { source: "BOG", target: "EYP", color: "grey" },
+                        { source: "BOG", target: "NVA", color: "grey" },
+                        { source: "BOG", target: "MDE", color: "grey" },
+                        { source: "BOG", target: "BAC", color: "grey" },
+                        { source: "BOG", target: "AXM", color: "grey" },
+                        { source: "BOG", target: "CRC", color: "grey" },
+                        { source: "BOG", target: "UIB", color: "grey" },
+
+                        { source: "MDE", target: "NVA", color: "grey" },
+                        { source: "MDE", target: "AXM", color: "grey" },
+                        { source: "MDE", target: "UIB", color: "grey" },
+                        { source: "MDE", target: "MTR", color: "grey" },
+                        { source: "BGA", target: "APO", color: "grey" },
+                        { source: "BGA", target: "CUC", color: "grey" },
+
+                        { source: "CTG", target: "MDE", color: "grey" },
+                        { source: "CTG", target: "MTR", color: "grey" },
+
+                        { source: "AXM", target: "CRC", color: "grey" },
+
+                        { source: "UIB", target: "APO", color: "grey" },
+                    ];
+
+                    nodes.forEach(node => {
+                        const [x, y] = projection(node.coords);
+                        node.x = x;
+                        node.y = y;
+                        if (node.id == origin){
+                            node.color = 'yellow'
+                        }
+
+                    });
+
+                    links.forEach(link => {
+                        if (data[0].includes(link.source) && data[0].includes(link.target)){
+                            link.color = '#0f62fe'
+                        }
+                    })
+
+                    svg.selectAll(".link")
+                    .data(links)
+                    .enter()
+                    .append("line")
+                    .attr("class", "link")
+                    .attr("x1", d => nodes.find(n => n.id === d.source).x)
+                    .attr("y1", d => nodes.find(n => n.id === d.source).y)
+                    .attr("x2", d => nodes.find(n => n.id === d.target).x)
+                    .attr("y2", d => nodes.find(n => n.id === d.target).y)
+                    .attr("fill", d => d.color)
+                    .attr("stroke", d => d.color);
+
+                    svg.selectAll(".node")
+                        .data(nodes)
+                        .enter()
+                        .append("circle")
+                        .attr("class", "node")
+                        .attr("cx", d => d.x)
+                        .attr("cy", d => d.y)
+                        .attr("r", 8)
+                        .attr("fill", d => d.color)
+                        .append("title")
+                        .text(d => d.id);
+
+                    svg.selectAll(".label")
+                    .data(nodes)
+                    .enter()
+                    .append("text")
+                    .attr("x", d => d.x + 12)
+                    .attr("y", d => d.y)
+                    .text(d => d.id);
+
+                    svg.selectAll(".airplane")
+                        
+                        .data(nodes)
+                        .enter()
+                        .append("svg")
+                        .attr("class", "airplane")
+                        .attr("x", d => d.x + 15)  // Position offset from node
+                        .attr("y", d => d.y - 15)  // Position offset from node
+                        .html(`
+                            <polygon points="0,0 3,4 6,0" />
+                        `);
+                });
+            })
+
+        const weatherData = {
+            "Medellín": { temperature: "25°C", conditions: "Clear" },
+            "Cali": { temperature: "28°C", conditions: "Partly Cloudy" },
+        };
+
+        const dropdown = document.getElementById("dropdown");
+        const searchButton = document.getElementById("search-button");
+        const currentDestinationLabel = document.getElementById("current-destination");
+        const weatherBox = document.getElementById("weather-content");
+
+        searchButton.addEventListener("click", () => {
+            const selectedDestination = dropdown.value;
+
+            currentDestinationLabel.textContent = `Destination: ${selectedDestination}`;
+
+            const weather = weatherData[selectedDestination];
+            weatherBox.innerHTML = `
+                <p>City: ${selectedDestination}</p>
+                <p>Temperature: ${weather.temperature}</p>
+                <p>Conditions: ${weather.conditions}</p>
+            `;
+        });
+    </script>
+</body>
+</html>
