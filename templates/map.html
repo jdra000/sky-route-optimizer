@@ -46,12 +46,12 @@
             align-items: center;
             justify-content: center;
             margin-right: 150px;
-            padding: 10px;
+            padding: 5px;
             background-color: #161616;
             border-radius: 10px;
             box-shadow: 0px 4px 8px rgba(93, 91, 91, 0.5);
-            height: 100px;
-            width: 300px;
+            height: 80px;
+            width: 280px;
         }
 
         #dropdown-wrapper {
@@ -59,7 +59,7 @@
             justify-content: center;
             align-items: center;
             gap: 10px;
-            margin-top: 10px;
+            margin-top: 5px;
         }
 
         #dropdown {
@@ -100,10 +100,8 @@
         #weather-box {
             background-color: #161616;
             padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0px 4px 8px rgba(93, 91, 91, 0.5);
-            height: 150px;
-            width: 280px;
+            height: 200px;
+            width: 350px;
             margin-top: 20px;
         }
 
@@ -130,13 +128,13 @@
         }
 
         text {
-            font-size: 12px;
+            font-size: 14px;
             fill: #f6f2ff;
         }
     </style>
 </head>
 <body>
-    <h1>BGA (Aeropuerto Internacional Palonegro)</h1>
+    <h1>SkyRoute: Air Route Management for BGA Airport </h1>
     <div id="container">
         <svg width="800" height="600"></svg>
         <div id="side-panel">
@@ -158,14 +156,11 @@
                     </select>
                     <button id="search-button">Search</button>
                 </div>
-                <div id="current-destination">Destination: Medellín</div>
             </div>
             <div id="weather-box">
-                <div id="weather-title">Weather Information</div>
+                <div id="weather-title">Routes Available </div>
                 <div id="weather-content">
-                    <p>City: Medellín</p>
-                    <p>Temperature: 25°C</p>
-                    <p>Conditions: Clear</p>
+                    
                 </div>
             </div>
         </div>
@@ -344,20 +339,26 @@
                 .attr("stroke", d => d.color);
         }
 
-        const weatherData = {
-            "Medellín": { temperature: "25°C", conditions: "Clear" },
-            "Cali": { temperature: "28°C", conditions: "Partly Cloudy" },
-        };
-
         const dropdown = document.getElementById("dropdown");
         const searchButton = document.getElementById("search-button");
         const currentDestinationLabel = document.getElementById("current-destination");
         const weatherBox = document.getElementById("weather-content");
+        
+        function show_routes(data){
+            let html_routes = ''
+            data.forEach(route => {
+                for(let i = 0; i<route.length; i++){
+                    route.length - i == 1 ? html_routes += ` ${route[i]} MAX`:html_routes+= ` ${route[i]} -- >`
+                }
+                html_routes += ` <br> <br>`
+            })
+            weatherBox.innerHTML = html_routes
+        }
+
 
         searchButton.addEventListener("click", () => {
             const selectedDestination = dropdown.value;
 
-            currentDestinationLabel.textContent = `Destination: ${selectedDestination}`;
             fetch('/', {
                 'method':'POST',
                 'headers': {'Content-Type': 'application/json'},
@@ -368,19 +369,8 @@
                 console.log(data)
                 reset_nodes_and_links()
                 render_map(data)
+                show_routes(data)
             })
-
-
-
-
-
-
-            const weather = weatherData[selectedDestination];
-            weatherBox.innerHTML = `
-                <p>City: ${selectedDestination}</p>
-                <p>Temperature: ${weather.temperature}</p>
-                <p>Conditions: ${weather.conditions}</p>
-            `;
         });
     </script>
 </body>

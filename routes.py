@@ -100,7 +100,7 @@ def functionality():
         graph = initialize_graph()
 
         graph.update_availability(report)
-        print(report)
+        print(report) # Misiing climate implementation
 
 
         starting_node = 'BGA'

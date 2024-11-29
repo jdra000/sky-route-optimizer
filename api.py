@@ -72,6 +72,7 @@ class API:
         async with session.get(url) as response:
             if response.status == 200:
                 data = await response.json()
+                print(data)
                 if data:
 
                     risks = 0
@@ -82,13 +83,13 @@ class API:
                     wind_conditions = data['wind'].get('speed')
 
                     # START CHECKING
-                    if cloud_conditions > 50 and temp_conditions < 270:
+                    if cloud_conditions > 70:
                         risks -= 1
-                    if humidity_conditions > 90:
-                        risks -=2
+                    if humidity_conditions > 70:
+                        risks -= 2
                     if visibility_conditions < 10000:
-                        risks -= 1
-                    if wind_conditions > 0.3:
-                        risks -= 1
+                        risks -= 3
+                    if wind_conditions > 5.1:
+                        risks -= 4
 
                     return risks
