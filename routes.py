@@ -88,31 +88,34 @@ city_codes = {
     'Cartagena':'CTG'
 }
 
-@app.route('/', methods=['POST', 'GET'])
+@app.route('/check_data', methods=['POST'])
 def functionality():
-    if request.method == 'POST':
-        # Get data
-        data = request.get_json()
-        print(data)
-        print(city_codes[data])
 
-        report = asyncio.run(api.main())
-        graph = initialize_graph()
+     # Get data
+     data = request.get_json()
+     print(data)
+     print(city_codes[data])
+     # Run Api and Initialize new Graph
+     report = asyncio.run(api.main())
+     graph = initialize_graph()
+     # Update graph based on API
+     graph.update_availability(report)
+     print(report) # Misiing climate implementation
+        
 
-        graph.update_availability(report)
-        print(report) # Misiing climate implementation
 
+     starting_node = 'BGA'
+     ending_node = city_codes[data]
 
-        starting_node = 'BGA'
-        ending_node = city_codes[data]
+     method = FordFulkerson(graph, starting_node, ending_node)
+     method.initiate()
+     print(method.paths)
 
-        method = FordFulkerson(graph, starting_node, ending_node)
-        method.initiate()
-        print(method.paths)
-
-        return jsonify(method.paths)
-    
+     return jsonify({'paths': method.paths, 'report':report})
+@app.route('/', methods = ['GET'])
+def render():
     return render_template('map.html')
+
 
 if __name__ == '__main__':
     app.run(port = 8000, debug=True)

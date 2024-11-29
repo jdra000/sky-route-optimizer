@@ -134,7 +134,7 @@
     </style>
 </head>
 <body>
-    <h1>SkyRoute: Air Route Management for BGA Airport </h1>
+    <h1>SkyRoute: Air Routes Management for BGA Airport </h1>
     <div id="container">
         <svg width="800" height="600"></svg>
         <div id="side-panel">
@@ -291,13 +291,12 @@
         function render_map(data){
             origin = data[0][0]
             destination = data[0][data[0].length - 2]
-
             nodes.forEach(node => {
                 if (node.id == origin){
                     node.color = '#0f62fe'
                 }else if (node.id == destination){
                     node.color = '#3ddbd9'
-                }
+		}
             })
 
             svg.selectAll(".node")
@@ -355,21 +354,47 @@
             weatherBox.innerHTML = html_routes
         }
 
+	function render_climate(report){
+		console.log(report)
+		nodes.forEach(node => {
+			console.log(report[node])
+			if (report[node.id] == -1){
+				node.color = 'black'
+			}else if (report[node.id] == -2){
+				node.color = 'red'
+			}
+		})
+
+		svg.selectAll(".node")
+			.data(nodes)
+			.attr("fill", d => d.color)
+	}
+
+	fetch('/', {
+		'method':'GET',
+		'headers': {'Content-Type':'application/json'}
+	})
+		.then(response => response.json())
+		.then(data => {
+			console.log(data)
+			render_climate(data)
+		})
 
         searchButton.addEventListener("click", () => {
             const selectedDestination = dropdown.value;
 
-            fetch('/', {
+            fetch('/check_data', {
                 'method':'POST',
                 'headers': {'Content-Type': 'application/json'},
                 'body': JSON.stringify(selectedDestination)
             })
             .then(response => response.json())
             .then(data =>{
-                console.log(data)
-                reset_nodes_and_links()
-                render_map(data)
-                show_routes(data)
+		    reset_nodes_and_links()
+		    render_map(data.paths)
+               	    show_routes(data.paths)
+
+		    render_climate(data.report)
             })
         });
     </script>
