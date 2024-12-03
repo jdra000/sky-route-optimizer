@@ -1,121 +1,87 @@
-# AIRPORT CODES:
-# BGA = BUCARAMANGA
-# BOG = BOGOTA
-# MDE = MEDELLIN
-# CUC = CUCUTA
-# BAC = BARRANCA
-# EYP = YOPAL
-# NVA = NEIVA
-# AXM = ARMENIA
-# CRC = CARTAGO
-# UIB = QUIBDO
-# APO = APARTADO
-# MTR = MONTERIA
-# CTG = CARTAGENA
-
-from flask import Flask,request, jsonify, render_template
-app = Flask(__name__)
-
 from graph import Graph 
-from api import API
 from ford_fulkerson import FordFulkerson
-from api import api_key
-import asyncio
-
 
 # STARTER GRAPH WITH CITIES AND CONNECTIONS
 def initialize_graph():
-    STARTER_GRAPH = Graph()
-    STARTER_GRAPH.add_nodes(['BGA', 'BOG', 'MDE', 'CUC', 'BAC', 'EYP',
-            'NVA', 'AXM', 'CRC', 'UIB', 'APO', 'MTR',
-            'CTG'])
+    graph = Graph()
+    graph.add_nodes(['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 
+                     'L', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Z'])
     # BGA
-    STARTER_GRAPH.add_edge('BGA', 'BOG', 5)
-    STARTER_GRAPH.add_edge('BGA', 'CUC', 5)
-    STARTER_GRAPH.add_edge('BGA', 'CTG', 5)
-    STARTER_GRAPH.add_edge('BGA', 'MDE', 5)
-    # BOG
-    STARTER_GRAPH.add_edge('BOG', 'EYP', 5)
-    STARTER_GRAPH.add_edge('BOG', 'NVA', 5)
-    STARTER_GRAPH.add_edge('BOG', 'MDE', 5)
-    STARTER_GRAPH.add_edge('BOG', 'BAC', 5)
-    STARTER_GRAPH.add_edge('BOG', 'AXM', 5)
-    STARTER_GRAPH.add_edge('BOG', 'CRC', 5)
-    STARTER_GRAPH.add_edge('BOG', 'UIB', 5)
-    # MED
-    STARTER_GRAPH.add_edge('MDE', 'NVA', 5)
-    STARTER_GRAPH.add_edge('MDE', 'AXM', 5)
-    STARTER_GRAPH.add_edge('MDE', 'UIB', 5)
-    STARTER_GRAPH.add_edge('MDE', 'MTR', 5)
-    STARTER_GRAPH.add_edge('MDE', 'APO', 5)
-    STARTER_GRAPH.add_edge('MDE', 'CUC', 5)
-    # CTG
-    STARTER_GRAPH.add_edge('CTG', 'MDE', 5)
-    STARTER_GRAPH.add_edge('CTG', 'MTR', 5)
-    # AXM
-    STARTER_GRAPH.add_edge('AXM', 'CRC', 5)
-    # UIB
-    STARTER_GRAPH.add_edge('UIB', 'APO', 5)
+    graph.add_edge('A', 'B', 4250)
+    graph.add_edge('A', 'C', 1410)
+    graph.add_edge('A', 'F', 4175)
 
-    return STARTER_GRAPH
+    graph.add_edge('B', 'F', 2010)
+    graph.add_edge('B', 'E', 3962)
 
-api = API(api_key)
-#report = asyncio.run(api.main())
-#STARTER_GRAPH.update_availability(report)
-#print('\nGRAPH UPDATED\n')
-#print(STARTER_GRAPH)
-#print()
+    graph.add_edge('F', 'G', 5275)
 
-#starting_node = 'BGA'
-#ending_node ='NVA'
-#method = FordFulkerson(STARTER_GRAPH, starting_node, ending_node)
-#print(f"The maximum possible flow is {method.initiate()}")
-#print(method.paths)
+    graph.add_edge('E', 'D', 4975)
+    graph.add_edge('E', 'G', 2462)
 
-city_codes = {
-    'Bucaramanga':'BGA', 
-    'Bogotá':'BOG', 
-    'Medellín':'MDE', 
-    'Cúcuta':'CUC', 
-    'Barrancabermeja':'BAC',
-    'Yopal':'EYP', 
-    'Neiva':'NVA', 
-    'Armenia':'AXM', 
-    'Cartago':'CRC', 
-    'Quibdó':'UIB', 
-    'Apartadó':'APO', 
-    'Montería':'MTR', 
-    'Cartagena':'CTG'
-}
+    graph.add_edge('D', 'J', 3850)
+    
+    graph.add_edge('J', 'O', 4125)
+    graph.add_edge('J', 'K', 4366)
 
-@app.route('/check_data', methods=['POST'])
+    graph.add_edge('K', 'L', 4025)
+    graph.add_edge('K', 'G', 4950)
+
+    graph.add_edge('G', 'L', 4200)
+    graph.add_edge('G', 'H', 2984)
+
+    graph.add_edge('L', 'Q', 4300)
+
+    graph.add_edge('O', 'P', 5933)
+    graph.add_edge('O', 'S', 4983)
+
+    graph.add_edge('P', 'Q', 4500)
+
+    graph.add_edge('S', 'T', 5900)
+
+    graph.add_edge('T', 'U', 1070)
+    
+    graph.add_edge('U', 'V', 1070)
+
+    graph.add_edge('Q', 'U', 4300)
+
+    graph.add_edge('H', 'I', 2984)
+    graph.add_edge('H', 'R', 980)
+
+    graph.add_edge('Q', 'R', 3525)
+
+    graph.add_edge('R', 'W', 1170)
+
+    graph.add_edge('W', 'N', 1370)
+    graph.add_edge('W', 'X', 1170)
+
+    graph.add_edge('V', 'W', 1370)
+    graph.add_edge('V', 'X', 1070)
+
+    graph.add_edge('I', 'N', 700)
+
+    graph.add_edge('C', 'I', 215)
+
+    graph.add_edge('X', 'Z', 1070)
+
+    graph.add_edge('N', 'Z', 880)
+
+    return graph
+
 def functionality():
-
-     # Get data
-     data = request.get_json()
-     print(data)
-     print(city_codes[data])
-     # Run Api and Initialize new Graph
-     report = asyncio.run(api.main())
+     # Initialize graph
      graph = initialize_graph()
      # Update graph based on API
-     graph.update_availability(report)
-     print(report) # Misiing climate implementation
         
 
 
-     starting_node = 'BGA'
-     ending_node = city_codes[data]
-
+     starting_node = 'A'
+     ending_node = 'Z'
+     
      method = FordFulkerson(graph, starting_node, ending_node)
-     method.initiate()
+     max_flow = method.initiate()
      print(method.paths)
-
-     return jsonify({'paths': method.paths, 'report':report})
-@app.route('/', methods = ['GET'])
-def render():
-    return render_template('map.html')
-
+     print(max_flow)
 
 if __name__ == '__main__':
-    app.run(port = 8000, debug=True)
+    functionality()
